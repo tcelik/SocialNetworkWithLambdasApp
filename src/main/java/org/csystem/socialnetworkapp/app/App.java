@@ -141,15 +141,30 @@ public class App {
         //forEach consumer alan bir arayüz.
         persons.forEach(person -> System.out.println(person.getAge()));
 
+        //fluent kalıbı stream nesneler var içinde collection tutuyor dinamik sınıf her neyse.
         //filter criteria test için yazılmış filtrelediklerini bir listede tutuyor aslında stream de tutuyor içinde byte var içinde collection var.
         ((ArrayList<Person>) persons).stream().filter(p -> p.getGender() == Person.Sex.MALE &&
                 p.getMaritalStatus() == Person.MaritalStatus.EVLI &&
                 p.getAge() >= 20 &&
                 p.getAge() <= 51 &&
-                p.getCity().equals("ankara")).map(p -> p.getMail()).forEach(email -> sendEmail(email));
+                p.getCity().equals("ankara")).map(p -> p.getMail()).forEach(App::sendEmail); //forEach(mail -> sendMail(mail)) ile aynı
+
+        //Amaç ortada bir dinamik tür olsun ve onun metotlarına çağrısı olduğu için lambda yerine çözünürlük operatörü
+        //kullanımı da yaygın
+        //action.accept(p) ne bu? bir metot çalışsın dimi al sana p bu p ile birşey yap mail -> sendMail
+
+        //e bu noktada doğrudan sendMail verilebilseydi. harika olmazmıydı. App::sendMail yazman yeterli maili o geçicek
+        //sendMail adresini aldı sendMail(mail) olarak her defasında içerinde çağırıyor.
+        //accept yerine sendMail çağrısı accept(p-mail) sendMail(mail) olarak runtimeda işlem görüyor.
 
 
-
+        //Dolayısıyla lamba ifadesinin çözünürlük operatörü ile kullanımında
+        //işin sadece businesini kodlaman yeterli
+        //üstelik sınıfa eklentide yapabilirsin.
+        //Sınıfı düşünmen gerekmez ortada local bir sınıf yok ki
+        //işin busines kısmını tabiki düşünüp lambda ifadelerine eklenti yap.
+        //metotları değiştirme zaten built-in support kullandın.
+        //interface isteğe bağlı zaten adamlar yazmış java.util.function.<FunctionalInterface - Pred, Func, Consumer, Supplier>
 
 
     }//main
