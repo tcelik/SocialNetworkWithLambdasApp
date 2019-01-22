@@ -89,7 +89,11 @@ public class App {
 
         //printPersonsWithPredicate(persons, generateLambda());
 
-        //testen geçerse birşey yapsın.
+        //Benim testimden(Predicate - tahmin) geçerse
+        //Benim accept metodum çalışsın.
+        //Liste, collection üzerinde tam bir kontrol.
+        //Şu kriterlere uyanlara mail atmak istiyorum.
+        //Senaryo sana kalmış.
         processPersons(persons,
                 p -> p.getGender() == Person.Sex.MALE && //erkek
                         p.getMaritalStatus() == Person.MaritalStatus.EVLI && //bekar olup
@@ -106,8 +110,8 @@ public class App {
     public static  void processPersons(List<Person> persons, Predicate<Person> tester, Consumer<Person> con)
     {
         for (Person p : persons) {
-            if (tester.test(p))
-                con.accept(p);
+            if (tester.test(p)) //adamın verdiği testen geçerse
+                con.accept(p); //adamın verdiği kodu çalıştır, derleyici nesne işlerini virtual function table kullanarak halletti.
         }
     }
 
