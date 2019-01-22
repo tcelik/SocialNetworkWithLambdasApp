@@ -23,7 +23,7 @@ public class App {
         */
 
         //İnit data
-        List<Person> persons = new ArrayList<>();
+        Iterable<Person> persons = new ArrayList<>();
         initData(persons);
 
         //printPersonsOlderThan(persons, 25);           //bu listede, 25 yaşından büyük olanlar
@@ -94,14 +94,103 @@ public class App {
         //Liste, collection üzerinde tam bir kontrol.
         //Şu kriterlere uyanlara mail atmak istiyorum.
         //Senaryo sana kalmış.
-        processPersons(persons,
+       /* processPersons(persons,
                 p -> p.getGender() == Person.Sex.MALE && //erkek
                         p.getMaritalStatus() == Person.MaritalStatus.EVLI && //bekar olup
                 p.getAge() >= 20 &&
                 p.getAge() <= 51 &&
                 p.getCity().equals("ankara"), p -> System.out.println(p.getName().toUpperCase()));
 
+        /*processPersonsIf(persons, //al sana liste
+                p -> p.getGender() == Person.Sex.MALE &&
+                        p.getMaritalStatus() == Person.MaritalStatus.EVLI &&
+                        p.getAge() >= 20 &&
+                        p.getAge() <= 51 &&
+                        p.getCity().equals("ankara"), //bu koşullara uyanların
+                p -> p.getName(), //isimlerini
+                name -> System.out.println(name)); //ekrana bas.*/
 
+
+
+
+        /*Approach 8: Use Generics More Extensively
+        processElementsHow(persons,
+                p -> p.getGender() == Person.Sex.MALE &&
+                p.getMaritalStatus() == Person.MaritalStatus.EVLI &&
+                p.getAge() >= 20 &&
+                p.getAge() <= 51 &&
+                p.getCity().equals("ankara"),
+                p -> p.getMail(),
+                mail -> sendEmail(mail));
+        */
+
+
+        //stream almak, nesneleri almak
+        ((ArrayList<Person>) persons).stream().forEach(person -> sendEmail(person.getMail()));
+
+        //adamlar yazmış iterable default metot her adımda nesne'lere consume etmek.
+        persons.forEach(p -> sendEmail(p.getMail()));
+
+        //zaten processElementHow yazılmış metotlar yazılmış yani lambda ifadesi bekleyen.
+        ((ArrayList<Person>) persons).stream().forEach(p -> System.out.println(p.getName()));
+
+        //aynısı yukarıdakinin.
+        for (Person p : persons)
+            System.out.println(p.getName());
+
+        //forEach consumer alan bir arayüz.
+        persons.forEach(person -> System.out.println(person.getAge()));
+
+        //filter criteria test için yazılmış filtrelediklerini bir listede tutuyor aslında stream de tutuyor içinde byte var içinde collection var.
+        ((ArrayList<Person>) persons).stream().filter(p -> p.getGender() == Person.Sex.MALE &&
+                p.getMaritalStatus() == Person.MaritalStatus.EVLI &&
+                p.getAge() >= 20 &&
+                p.getAge() <= 51 &&
+                p.getCity().equals("ankara")).map(p -> p.getMail()).forEach(email -> sendEmail(email));
+
+
+
+
+
+    }//main
+
+    private static void sendEmail(String mail)
+    {
+        //<send email code here>
+    }
+
+    //Generic istediğin liste gelebilir (Person tutan liste, Car tutan liste, Node tutan liste.)
+    //İstediğin şekilde test edebilir.
+    //İstediğin datayı alabilir.
+    //İstediğini yapabilirsin -> mail gönder gibi.
+    //Sınıfa veri elemanı eklersen ne yapıcağını lambda ifadelerini değiştir gerisine karışma.
+    //Sınıfa veri elemanı eklendiğinde metotları kopyalamak yerine lambda yazıcaz, test kısmında.
+    //Bunu biz yazdık zaten functional support apisi var java.util.stream paketinde.
+    public static <X, Y> void processElementsHow(Iterable<X> source,
+                                          Predicate<X> tester,
+                                          Function<X, Y> mapper,
+                                             Consumer<Y> block)
+    {
+        for (X x : source) {
+            if (tester.test(x)) {
+                Y y = mapper.apply(x); //data
+                block.accept(y);
+            }
+        }
+    }
+
+    //Mapper arayüzü ile data çekmek onu concumer ile consume etmek.
+    public static void processPersonsIf(List<Person> persons,
+                                                  Predicate<Person> tester,
+                                                  Function<Person, String> mapper,
+                                                  Consumer<String> block)
+    {
+        for (Person p : persons) {
+            if (tester.test(p)) {
+                String data = mapper.apply(p);
+                block.accept(data);
+            }
+        }
     }
 
     //Genel yazmak
@@ -115,7 +204,8 @@ public class App {
         }
     }
 
-    public static Predicate<Person> generateLambda()
+    //Lambda üretilebilen birşey aslında aklında bulunsun.
+    public static Predicate<Person> generateLambdaPredGibi()
     {
         return (Person p) -> // just p
                 p.getGender() == Person.Sex.MALE && //erkek
@@ -135,6 +225,7 @@ public class App {
         }
     }
 
+    //Bu iş böyle olmayacak diyip interface ICheckPerson yazmak, sonra built-in function geçmek.
     public static void printPersonsWithCriteria(List<Person> persons, Predicate<Person> pred)
     {
         for (Person p : persons) {
@@ -181,13 +272,16 @@ public class App {
         }
     }
 
-    public static void initData(List<Person> persons)
+    //İnit data
+    public static void initData(Iterable<Person> persons)
     {
-        persons.add(new Person("tugberk", LocalDate.of(1994, 5, 23), Person.Sex.MALE, "m@gmail.com", Person.MaritalStatus.BEKAR, "ankara"));
-        persons.add(new Person("sumeyye", LocalDate.of(1994, 3, 14), Person.Sex.FEMALE, "s@gmail.com", Person.MaritalStatus.BEKAR, "trabzon"));
-        persons.add(new Person("bugra", LocalDate.of(1998, 2, 21), Person.Sex.MALE, "b@gmail.com", Person.MaritalStatus.BEKAR, "istanbul"));
-        persons.add(new Person("ertan", LocalDate.of(1968, 8, 1), Person.Sex.MALE, "er@gmail.com", Person.MaritalStatus.EVLI, "ankara"));
-        persons.add(new Person("esma", LocalDate.of(1971, 6, 1), Person.Sex.FEMALE, "es@gmail.com", Person.MaritalStatus.EVLI, "ankara"));
+        List<Person> persons_ = (List<Person>) persons;
+
+        persons_.add(new Person("tugberk", LocalDate.of(1994, 5, 23), Person.Sex.MALE, "m@gmail.com", Person.MaritalStatus.BEKAR, "ankara"));
+        persons_.add(new Person("sumeyye", LocalDate.of(1994, 3, 14), Person.Sex.FEMALE, "s@gmail.com", Person.MaritalStatus.BEKAR, "trabzon"));
+        persons_.add(new Person("bugra", LocalDate.of(1998, 2, 21), Person.Sex.MALE, "b@gmail.com", Person.MaritalStatus.BEKAR, "istanbul"));
+        persons_.add(new Person("ertan", LocalDate.of(1968, 8, 1), Person.Sex.MALE, "er@gmail.com", Person.MaritalStatus.EVLI, "ankara"));
+        persons_.add(new Person("esma", LocalDate.of(1971, 6, 1), Person.Sex.FEMALE, "es@gmail.com", Person.MaritalStatus.EVLI, "ankara"));
     }
 }
 
